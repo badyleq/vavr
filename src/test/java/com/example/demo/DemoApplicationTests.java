@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import io.vavr.Tuple;
 
 import static io.vavr.API.*;
 
+import static io.vavr.Predicates.isIn;
 import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
@@ -39,7 +41,7 @@ public class DemoApplicationTests {
 
 		Function1<String, String> sayHelloAndGreet = sayHello.andThen(doGreeting);
 
-		assertThat(sayHelloAndGreet.apply("Stefan")).isEqualTo("Hello Stefan, nice to see you!");
+		System.out.println(sayHelloAndGreet.apply("Stefan"));
 	}
 
 	@Test
@@ -76,4 +78,18 @@ public class DemoApplicationTests {
 		String s = Match(req).of(Case($(1), "one"), Case($(2), "two"), Case($(), "?"));
 		System.out.println(s);
 	}
+
+	@Test
+	public void testPatternMatching2() {
+		val arg = "-u";
+		Match(arg).of(
+				Case($(isIn("-h", "--help")), o -> run(() -> System.out.println("help"))),
+				Case($(isIn("-v", "--version")), o -> run(() -> System.out.println("version"))),
+				Case($(), o -> run(() -> {
+					throw new IllegalArgumentException(arg);
+				}))
+		);
+	}
+
+
 }
